@@ -1,3 +1,4 @@
+import register from './register.js';
 const guestPage= `
 <div>
 <form id="login-form">
@@ -8,6 +9,7 @@ const guestPage= `
 <input type="password" name="password" required>
 <br>
 <button type="submit">Login</button>
+<button type="button" id="register-button">Register</button>
 </form>
 </div>      
 `;
@@ -26,7 +28,11 @@ document.addEventListener('DOMContentLoaded', function() {
     mainElement.innerHTML = page;
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
-      loginForm.addEventListener('submit', logIn); //logIn()
+      loginForm.addEventListener('submit', logIn); 
+    }
+    const registerButton = document.getElementById('register-button');
+    if (registerButton) {
+      registerButton.addEventListener('click', registration);
     }
   }
 });
@@ -60,4 +66,13 @@ async function logIn(event){
     console.log(e);
   }
   
+}
+
+function registration()
+{
+  const registerPage = register();
+  const mainElement = document.getElementById('main');
+  if (mainElement) {
+    mainElement.innerHTML = registerPage;
+  }
 }

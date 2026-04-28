@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Pastpapers Database</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .admin-container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .sidebar h2 {
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .sidebar ul {
+            list-style: none;
+        }
+        
+        .sidebar ul li {
+            margin: 10px 0;
+        }
+        
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar a:hover {
+            background-color: #3498db;
+        }
+        
+        .sidebar a.active {
+            background-color: #3498db;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background-color: white;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .card {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 32px;
+            margin: 10px 0;
+        }
+        
+        .stat-card p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .stat-card:nth-child(2) {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .stat-card:nth-child(3) {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .stat-card:nth-child(4) {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        table th {
+            background-color: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            font-weight: bold;
+        }
+        
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 2px;
+        }
+        
+        .badge-admin {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .badge-user {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .badge-active {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .badge-inactive {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .questions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .question-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+        }
+        
+        .question-item h4 {
+            margin-bottom: 5px;
+        }
+        
+        .question-item .meta {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .question-item .questions-preview {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="sidebar">
+            <h2>🎯 Admin Panel</h2>
+            <ul>
+                <li><a href="#" onclick="switchSection('dashboard')" class="menu-link active">📊 Dashboard</a></li>
+                <li><a href="#" onclick="switchSection('post-question')" class="menu-link">📝 Post Question</a></li>
+                <li><a href="#" onclick="switchSection('questions')" class="menu-link">❓ Questions</a></li>
+                <li><a href="#" onclick="switchSection('users')" class="menu-link">👥 Users</a></li>
+                <li><a href="#" onclick="switchSection('analytics')" class="menu-link">📈 Analytics</a></li>
+                <li><a href="#logout" class="menu-link" style="margin-top: 30px; color: #e74c3c;">🚪 Logout</a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1>Pastpapers Database - Admin Panel</h1>
+                <div id="user-info">Welcome, Admin</div>
+            </div>
+            
+            <div class="content">
+                <!-- Dashboard Section -->
+                <div id="dashboard" class="section active">
+                    <h2>Dashboard</h2>
+                    <div class="stats-grid" id="stats-container">
+                        <div class="stat-card">
+                            <p>Total Users</p>
+                            <h3 id="stat-users">0</h3>
+                        </div>
+                        <div class="stat-card">
+                            <p>Total Questions</p>
+                            <h3 id="stat-questions">0</h3>
+                        </div>
+                        <div class="stat-card">
+                            <p>Total Answers</p>
+                            <h3 id="stat-answers">0</h3>
+                        </div>
+                        <div class="stat-card">
+                            <p>Total Votes</p>
+                            <h3 id="stat-votes">0</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Top Contributors</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>User</th>
+                                    <th>Reputation</th>
+                                    <th>Answers</th>
+                                    <th>Correct Answers</th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-contributors">
+                                <tr><td colspan="5">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Post Question Section -->
+                <div id="post-question" class="section">
+                    <div class="card">
+                        <h2>Post New Question</h2>
+                        <form id="question-form">
+                            <div class="form-group">
+                                <label>Question Title *</label>
+                                <input type="text" id="q-title" required placeholder="e.g., Computer Science - 2023 Paper 1">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea id="q-description" placeholder="Brief description of the question set"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Difficulty Level *</label>
+                                <select id="q-difficulty" required>
+                                    <option value="easy">Easy</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="hard">Hard</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Questions (JSON Format) *</label>
+                                <textarea id="q-questions" required placeholder='[{"question_number": 1, "question_text": "What is...?", "marks": 2}]'></textarea>
+                            </div>
+                            
+                            <button type="submit">Post Question</button>
+                            <div id="form-message"></div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Questions Section -->
+                <div id="questions" class="section">
+                    <h2>All Questions</h2>
+                    <div id="questions-container" class="questions-list">
+                        <p>Loading questions...</p>
+                    </div>
+                </div>
+                
+                <!-- Users Section -->
+                <div id="users" class="section">
+                    <h2>User Management</h2>
+                    <div class="card">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Reputation</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table">
+                                <tr><td colspan="6">Loading users...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Analytics Section -->
+                <div id="analytics" class="section">
+                    <h2>Analytics & Reports</h2>
+                    <div class="card">
+                        <h3>Questions by Difficulty</h3>
+                        <div id="difficulty-stats">
+                            Loading...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost/Pastpapers%20database/backend/api';
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+            
+            document.getElementById('question-form').addEventListener('submit', postQuestion);
+        });
+        
+        function switchSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load data based on section
+            if (sectionId === 'dashboard') {
+                loadDashboard();
+            } else if (sectionId === 'questions') {
+                loadQuestions();
+            } else if (sectionId === 'users') {
+                loadUsers();
+            } else if (sectionId === 'analytics') {
+                loadAnalytics();
+            }
+        }
+        
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/admin-stats.php`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('stat-users').textContent = data.data.total_users;
+                    document.getElementById('stat-questions').textContent = data.data.total_questions;
+                    document.getElementById('stat-answers').textContent = data.data.total_answers;
+                    document.getElementById('stat-votes').textContent = data.data.total_votes;
+                    
+                    // Load top contributors
+                    let html = '';
+                    if (data.data.top_contributors) {
+                        data.data.top_contributors.forEach((user, index) => {
+                            html += `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td><div class="user-info"><img src="${user.avatar}" class="user-avatar">${user.user_name}</div></td>
+                                    <td>${user.reputation_points}</td>
+                                    <td>${user.answers_count || 0}</td>
+                                    <td>${user.correct_answers || 0}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+                    document.getElementById('top-contributors').innerHTML = html || '<tr><td colspan="5">No data</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+        
+        async function loadQuestions() {
+            try {
+                const response = await fetch(`${API_BASE}/questions.php`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    let html = '';
+                    data.data.forEach(q => {
+                        html += `
+                            <div class="question-item">
+                                <h4>${q.title}</h4>
+                                <div class="meta">Posted by ${q.posted_by_name} • ${new Date(q.created_at).toLocaleDateString()}</div>
+                                <div class="meta">Difficulty: <strong>${q.difficulty}</strong> • Answers: ${q.answers_count}</div>
+                                <div class="questions-preview">
+                                    ${q.questions.length} question(s): ${q.questions.map(q => q.question_text.substring(0, 50) + '...').join('; ')}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    document.getElementById('questions-container').innerHTML = html || '<p>No questions posted yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading questions:', error);
+            }
+        }
+        
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_BASE}/admin-users.php`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    let html = '';
+                    data.data.forEach(user => {
+                        const roleClass = user.role === 'admin' ? 'badge-admin' : 'badge-user';
+                        const statusClass = user.status === 'active' ? 'badge-active' : 'badge-inactive';
+                        
+                        html += `
+                            <tr>
+                                <td>${user.name}</td>
+                                <td>${user.email}</td>
+                                <td><span class="badge ${roleClass}">${user.role.toUpperCase()}</span></td>
+                                <td><span class="badge ${statusClass}">${user.status.toUpperCase()}</span></td>
+                                <td>${user.reputation?.reputation_points || 0}</td>
+                                <td>
+                                    <button onclick="editUser('${user.id}', '${user.role}')">Edit</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    document.getElementById('users-table').innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+        
+        async function loadAnalytics() {
+            try {
+                const response = await fetch(`${API_BASE}/admin-stats.php`);
+                const data = await response.json();
+                
+                if (data.success && data.data.questions_by_difficulty) {
+                    const stats = data.data.questions_by_difficulty;
+                    const html = `
+                        <ul>
+                            <li>Easy: ${stats.easy} questions</li>
+                            <li>Medium: ${stats.medium} questions</li>
+                            <li>Hard: ${stats.hard} questions</li>
+                        </ul>
+                    `;
+                    document.getElementById('difficulty-stats').innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+        
+        async function postQuestion(e) {
+            e.preventDefault();
+            
+            try {
+                const questionsText = document.getElementById('q-questions').value;
+                let questions;
+                
+                try {
+                    questions = JSON.parse(questionsText);
+                } catch {
+                    alert('Invalid JSON format for questions');
+                    return;
+                }
+                
+                const payload = {
+                    title: document.getElementById('q-title').value,
+                    description: document.getElementById('q-description').value,
+                    difficulty: document.getElementById('q-difficulty').value,
+                    questions: questions
+                };
+                
+                const response = await fetch(`${API_BASE}/questions.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                const messageDiv = document.getElementById('form-message');
+                
+                if (data.success) {
+                    messageDiv.innerHTML = '<div class="alert alert-success">Question posted successfully!</div>';
+                    document.getElementById('question-form').reset();
+                    setTimeout(() => messageDiv.innerHTML = '', 3000);
+                } else {
+                    messageDiv.innerHTML = `<div class="alert alert-error">${data.message}</div>`;
+                }
+            } catch (error) {
+                console.error('Error posting question:', error);
+                document.getElementById('form-message').innerHTML = '<div class="alert alert-error">Error posting question</div>';
+            }
+        }
+        
+        function editUser(userId, currentRole) {
+            const newRole = prompt('Enter new role (admin/user):', currentRole);
+            if (newRole) {
+                // TODO: Implement role update via API
+                alert('Role update for ' + userId + ' to ' + newRole);
+            }
+        }
+    </script>
+</body>
+</html>

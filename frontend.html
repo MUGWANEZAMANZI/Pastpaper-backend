@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pastpapers Database - Student Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .navbar h1 {
+            font-size: 1.5rem;
+        }
+        
+        .navbar-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .auth-container {
+            max-width: 500px;
+            margin: 3rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .auth-container h2 {
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #667eea;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+        
+        button {
+            background-color: #667eea;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        
+        button:hover {
+            background-color: #5568d3;
+        }
+        
+        .text-center {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .text-center a {
+            color: #667eea;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .text-center a:hover {
+            text-decoration: underline;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+        
+        .sidebar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            height: fit-content;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .sidebar-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background-color: #667eea;
+            color: white;
+        }
+        
+        .content-area {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .questions-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .question-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .question-card h3 {
+            margin-bottom: 0.5rem;
+            color: #667eea;
+        }
+        
+        .question-meta {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin: 0.5rem 0;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+        }
+        
+        .badge-easy {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-hard {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 2rem;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-card p {
+            opacity: 0.9;
+        }
+        
+        .stat-card:nth-child(2) {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .stat-card:nth-child(3) {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .leaderboard-table th {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .leaderboard-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .leaderboard-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .rank-badge {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 50%;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .answer-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .answer-form {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .answer-form textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .answer-item {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        
+        .answer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+        
+        .answer-author {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .answer-votes {
+            text-align: center;
+        }
+        
+        .vote-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0;
+        }
+        
+        .vote-btn:hover {
+            color: #5568d3;
+        }
+        
+        .vote-count {
+            margin: 0.5rem 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="navbar">
+        <h1>📚 Pastpapers Database</h1>
+        <div class="navbar-right">
+            <div class="user-menu" id="user-menu">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Auth Screen -->
+    <div id="auth-screen" class="auth-container">
+        <div id="login-form">
+            <h2>Login</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit">Login</button>
+                <div class="text-center">
+                    Don't have account? <a onclick="showRegisterForm()">Register here</a>
+                </div>
+            </form>
+        </div>
+        
+        <div id="register-form" class="hidden">
+            <h2>Register</h2>
+            <form onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Full Name:</label>
+                    <input type="text" id="register-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <button type="submit">Register</button>
+                <div class="text-center">
+                    Already have account? <a onclick="showLoginForm()">Login here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Main App -->
+    <div id="app" class="hidden">
+        <div class="container">
+            <div class="main-content">
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <div class="sidebar-link active" onclick="switchTab('questions')">❓ Questions</div>
+                    <div class="sidebar-link" onclick="switchTab('my-answers')">📝 My Answers</div>
+                    <div class="sidebar-link" onclick="switchTab('dashboard')">📊 Dashboard</div>
+                    <div class="sidebar-link" onclick="switchTab('leaderboard')">🏆 Leaderboard</div>
+                    <hr style="margin: 1rem 0;">
+                    <div class="sidebar-link" onclick="logout()">🚪 Logout</div>
+                </div>
+                
+                <!-- Content -->
+                <div class="content-area">
+                    <!-- Questions Section -->
+                    <div id="questions" class="section active">
+                        <h2>📚 Past Papers & Questions</h2>
+                        <div id="questions-list" class="questions-grid">
+                            <div class="loader"></div> Loading questions...
+                        </div>
+                    </div>
+                    
+                    <!-- My Answers Section -->
+                    <div id="my-answers" class="section">
+                        <h2>📝 My Answers</h2>
+                        <div id="answers-list">
+                            <div class="loader"></div> Loading your answers...
+                        </div>
+                    </div>
+                    
+                    <!-- Dashboard Section -->
+                    <div id="dashboard" class="section">
+                        <h2>📊 My Dashboard</h2>
+                        <div id="dashboard-content">
+                            <div class="loader"></div> Loading dashboard...
+                        </div>
+                    </div>
+                    
+                    <!-- Leaderboard Section -->
+                    <div id="leaderboard" class="section">
+                        <h2>🏆 Top Contributors</h2>
+                        <div id="leaderboard-content">
+                            <div class="loader"></div> Loading leaderboard...
+                        </div>
+                    </div>
+                    
+                    <!-- Question Detail (Hidden, shown on demand) -->
+                    <div id="question-detail" class="section">
+                        <div id="question-detail-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost/Pastpapers%20database/backend/api';
+        let currentUser = null;
+        let currentQuestion = null;
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+        });
+        
+        // ===== Authentication =====
+        async function checkAuth() {
+            try {
+                const response = await fetch(`${API_BASE}/dashboard.php`, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data.data.user;
+                    showApp();
+                    updateUserMenu();
+                    loadQuestions();
+                } else {
+                    showAuthScreen();
+                }
+            } catch (error) {
+                showAuthScreen();
+            }
+        }
+        
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/login.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentUser = data.user;
+                    showApp();
+                    updateUserMenu();
+                    loadQuestions();
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                alert('Login error: ' + error.message);
+            }
+        }
+        
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/register.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Registration successful! Please login.');
+                    showLoginForm();
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                alert('Registration error: ' + error.message);
+            }
+        }
+        
+        async function logout() {
+            try {
+                await fetch(`${API_BASE}/logout.php`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                currentUser = null;
+                showAuthScreen();
+                showLoginForm();
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+        
+        // ===== UI Functions =====
+        function showAuthScreen() {
+            document.getElementById('auth-screen').classList.remove('hidden');
+            document.getElementById('app').classList.add('hidden');
+        }
+        
+        function showApp() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+        }
+        
+        function showLoginForm() {
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('register-form').classList.add('hidden');
+        }
+        
+        function showRegisterForm() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+        }
+        
+        function updateUserMenu() {
+            const menu = document.getElementById('user-menu');
+            if (currentUser) {
+                menu.innerHTML = `
+                    <div class="user-menu">
+                        <img src="${currentUser.avatar}" class="user-avatar">
+                        <span>${currentUser.name}</span>
+                    </div>
+                `;
+            }
+        }
+        
+        function switchTab(tabName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load data
+            if (tabName === 'my-answers') {
+                loadMyAnswers();
+            } else if (tabName === 'dashboard') {
+                loadDashboard();
+            } else if (tabName === 'leaderboard') {
+                loadLeaderboard();
+            }
+        }
+        
+        // ===== Data Loading =====
+        async function loadQuestions() {
+            try {
+                const response = await fetch(`${API_BASE}/questions.php`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    let html = '';
+                    data.data.forEach(question => {
+                        const difficultyClass = `badge-${question.difficulty}`;
+                        html += `
+                            <div class="question-card" onclick="viewQuestion('${question.id}')">
+                                <h3>${question.title}</h3>
+                                <div class="question-meta">
+                                    <span class="badge ${difficultyClass}">${question.difficulty.toUpperCase()}</span>
+                                    <span>📌 ${question.questions.length} questions • 💬 ${question.answers_count} answers</span>
+                                </div>
+                                <p style="margin-top: 0.5rem; color: #666;">${question.description}</p>
+                                <div class="question-meta">By ${question.posted_by_name} • ${new Date(question.created_at).toLocaleDateString()}</div>
+                            </div>
+                        `;
+                    });
+                    document.getElementById('questions-list').innerHTML = html || '<p>No questions available yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading questions:', error);
+                document.getElementById('questions-list').innerHTML = '<p>Error loading questions</p>';
+            }
+        }
+        
+        async function viewQuestion(questionId) {
+            try {
+                const response = await fetch(`${API_BASE}/question-detail.php?id=${questionId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentQuestion = data.data;
+                    displayQuestionDetail();
+                }
+            } catch (error) {
+                console.error('Error loading question:', error);
+            }
+        }
+        
+        function displayQuestionDetail() {
+            const q = currentQuestion;
+            
+            let questionsHtml = '';
+            q.questions.forEach(qst => {
+                questionsHtml += `
+                    <div style="margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                        <strong>Question ${qst.question_number}:</strong> ${qst.question_text}
+                        <div style="margin-top: 0.5rem; color: #7f8c8d;">Marks: ${qst.marks}</div>
+                    </div>
+                `;
+            });
+            
+            let answersHtml = '';
+            if (q.answers && q.answers.length > 0) {
+                q.answers.forEach(answer => {
+                    answersHtml += `
+                        <div class="answer-item">
+                            <div class="answer-header">
+                                <div class="answer-author">
+                                    <img src="${answer.user_avatar}" style="width: 30px; height: 30px; border-radius: 50%;">
+                                    <div>
+                                        <strong>${answer.user_name}</strong>
+                                        <div style="font-size: 0.85rem; color: #7f8c8d;">${new Date(answer.created_at).toLocaleDateString()}</div>
+                                    </div>
+                                </div>
+                                <div class="answer-votes">
+                                    <button class="vote-btn" onclick="voteAnswer('${answer.id}')">👍</button>
+                                    <div class="vote-count">${answer.votes}</div>
+                                    ${answer.is_correct ? '<div style="color: #27ae60; font-weight: bold;">✓ Correct</div>' : ''}
+                                </div>
+                            </div>
+                            <p>${answer.content}</p>
+                        </div>
+                    `;
+                });
+            }
+            
+            const content = `
+                <button onclick="switchTab('questions')" style="margin-bottom: 1rem; background: #95a5a6;">← Back</button>
+                <h2>${q.title}</h2>
+                <div class="question-meta" style="margin-bottom: 1.5rem;">
+                    <span class="badge badge-${q.difficulty}">${q.difficulty.toUpperCase()}</span>
+                    By ${q.posted_by_name}
+                </div>
+                
+                <div style="background: #e8f4f8; padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem;">
+                    <strong>📖 Questions:</strong>
+                    ${questionsHtml}
+                </div>
+                
+                <div class="answer-section">
+                    <h3>💬 Answers (${q.answers ? q.answers.length : 0})</h3>
+                    
+                    <div class="answer-form">
+                        <h4>Share Your Answer</h4>
+                        <textarea id="new-answer" placeholder="Write your answer here..."></textarea>
+                        <button onclick="postAnswer()" style="margin-top: 1rem;">Post Answer</button>
+                    </div>
+                    
+                    <div>${answersHtml || '<p>No answers yet. Be the first to answer!</p>'}</div>
+                </div>
+            `;
+            
+            document.getElementById('question-detail').classList.add('active');
+            document.getElementById('questions').classList.remove('active');
+            document.getElementById('question-detail-content').innerHTML = content;
+        }
+        
+        async function postAnswer() {
+            const content = document.getElementById('new-answer').value.trim();
+            
+            if (!content) {
+                alert('Please write an answer');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/answers.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        question_id: currentQuestion.id,
+                        content: content
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Answer posted successfully!');
+                    document.getElementById('new-answer').value = '';
+                    viewQuestion(currentQuestion.id);
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                alert('Error posting answer: ' + error.message);
+            }
+        }
+        
+        async function voteAnswer(answerId) {
+            try {
+                const response = await fetch(`${API_BASE}/vote.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ answer_id: answerId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    viewQuestion(currentQuestion.id);
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                alert('Error voting: ' + error.message);
+            }
+        }
+        
+        async function loadMyAnswers() {
+            // This would require an API endpoint to get user's specific answers
+            try {
+                const response = await fetch(`${API_BASE}/dashboard.php`, {
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                let html = '';
+                if (data.data.recent_answers && data.data.recent_answers.length > 0) {
+                    data.data.recent_answers.forEach(answer => {
+                        html += `
+                            <div class="answer-item">
+                                <strong>${answer.content.substring(0, 100)}...</strong>
+                                <div class="question-meta">
+                                    👍 ${answer.votes} votes • ${answer.is_correct ? '✓ Correct' : 'Pending review'}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                document.getElementById('answers-list').innerHTML = html || '<p>You haven\'t answered any questions yet.</p>';
+            } catch (error) {
+                console.error('Error loading answers:', error);
+            }
+        }
+        
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/dashboard.php`, {
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                const rep = data.data.reputation;
+                
+                let badgesHtml = '';
+                if (data.data.activity.badges) {
+                    data.data.activity.badges.forEach(badge => {
+                        badgesHtml += `<span style="font-size: 2rem; margin: 0.5rem;">${badge.icon}</span>`;
+                    });
+                }
+                
+                const html = `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <p>Reputation Points</p>
+                            <h3>${rep.total_points}</h3>
+                        </div>
+                        <div class="stat-card">
+                            <p>Answers</p>
+                            <h3>${rep.answers_count}</h3>
+                        </div>
+                        <div class="stat-card">
+                            <p>Correct Answers</p>
+                            <h3>${rep.correct_answers}</h3>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 4px;">
+                        <h3>🎖️ Your Badges</h3>
+                        <div style="margin-top: 1rem;">${badgesHtml || '<p>No badges earned yet.</p>'}</div>
+                    </div>
+                `;
+                
+                document.getElementById('dashboard-content').innerHTML = html;
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+        
+        async function loadLeaderboard() {
+            try {
+                const response = await fetch(`${API_BASE}/leaderboard.php?limit=20`, {
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                let html = '<table class="leaderboard-table"><thead><tr><th>Rank</th><th>User</th><th>Reputation</th><th>Answers</th><th>Correct</th></tr></thead><tbody>';
+                
+                if (data.data && data.data.length > 0) {
+                    data.data.forEach(user => {
+                        html += `
+                            <tr>
+                                <td><div class="rank-badge">${user.rank}</div></td>
+                                <td><div class="answer-author"><img src="${user.avatar}" style="width: 30px; height: 30px; border-radius: 50%;"><strong>${user.user_name}</strong></div></td>
+                                <td>${user.reputation_points}</td>
+                                <td>${user.answers_count}</td>
+                                <td>${user.correct_answers}</td>
+                            </tr>
+                        `;
+                    });
+                }
+                
+                html += '</tbody></table>';
+                document.getElementById('leaderboard-content').innerHTML = html;
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+            }
+        }
+    </script>
+</body>
+</html>
