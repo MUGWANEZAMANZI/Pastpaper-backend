@@ -1,0 +1,14 @@
+{
+"students": [
+{
+"name": "MUGWANEZA MANZI",
+"email": "mugwaneza@school.com",
+"password": "demo123"
+},
+{
+"name": "John Doe",
+"email": "john@school.com",
+"password": "pass456"
+}
+]
+}
